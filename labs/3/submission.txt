@@ -1,0 +1,91 @@
+Server: 
+listening on ('127.0.0.1', 12358)
+accepted connection from ('127.0.0.1', 41000)
+accepted connection from ('127.0.0.1', 41002)
+accepted connection from ('127.0.0.1', 41004)
+echoing b'Message 1 from Casey Key.Message 2 from Casey Key.' to ('127.0.0.1', 41000)
+echoing b'Message 1 from Casey Key.Message 2 from Casey Key.' to ('127.0.0.1', 41002)
+accepted connection from ('127.0.0.1', 41006)
+closing connection to ('127.0.0.1', 41000)
+closing connection to ('127.0.0.1', 41002)
+echoing b'Message 1 from Casey Key.Message 2 from Casey Key.' to ('127.0.0.1', 41004)
+accepted connection from ('127.0.0.1', 41008)
+closing connection to ('127.0.0.1', 41004)
+echoing b'Message 1 from Casey Key.Message 2 from Casey Key.' to ('127.0.0.1', 41006)
+accepted connection from ('127.0.0.1', 41010)
+echoing b'Message 1 from Casey Key.Message 2 from Casey Key.' to ('127.0.0.1', 41008)
+accepted connection from ('127.0.0.1', 41012)
+closing connection to ('127.0.0.1', 41006)
+echoing b'Message 1 from Casey Key.Message 2 from Casey Key.' to ('127.0.0.1', 41010)
+accepted connection from ('127.0.0.1', 41014)
+closing connection to ('127.0.0.1', 41008)
+echoing b'Message 1 from Casey Key.Message 2 from Casey Key.' to ('127.0.0.1', 41012)
+accepted connection from ('127.0.0.1', 41016)
+closing connection to ('127.0.0.1', 41010)
+echoing b'Message 1 from Casey Key.Message 2 from Casey Key.' to ('127.0.0.1', 41014)
+accepted connection from ('127.0.0.1', 41018)
+closing connection to ('127.0.0.1', 41012)
+closing connection to ('127.0.0.1', 41014)
+echoing b'Message 1 from Casey Key.Message 2 from Casey Key.' to ('127.0.0.1', 41016)
+echoing b'Message 1 from Casey Key.Message 2 from Casey Key.' to ('127.0.0.1', 41018)
+closing connection to ('127.0.0.1', 41016)
+closing connection to ('127.0.0.1', 41018)
+
+Client:
+starting connection 1 to ('127.0.0.1', 12358)
+starting connection 2 to ('127.0.0.1', 12358)
+starting connection 3 to ('127.0.0.1', 12358)
+starting connection 4 to ('127.0.0.1', 12358)
+starting connection 5 to ('127.0.0.1', 12358)
+starting connection 6 to ('127.0.0.1', 12358)
+starting connection 7 to ('127.0.0.1', 12358)
+starting connection 8 to ('127.0.0.1', 12358)
+starting connection 9 to ('127.0.0.1', 12358)
+starting connection 10 to ('127.0.0.1', 12358)
+sending b'Message 1 from Casey Key.' to connection 1
+sending b'Message 1 from Casey Key.' to connection 2
+sending b'Message 1 from Casey Key.' to connection 3
+sending b'Message 1 from Casey Key.' to connection 4
+sending b'Message 1 from Casey Key.' to connection 5
+sending b'Message 1 from Casey Key.' to connection 6
+sending b'Message 1 from Casey Key.' to connection 7
+sending b'Message 1 from Casey Key.' to connection 8
+sending b'Message 1 from Casey Key.' to connection 9
+sending b'Message 1 from Casey Key.' to connection 10
+sending b'Message 2 from Casey Key.' to connection 1
+sending b'Message 2 from Casey Key.' to connection 2
+sending b'Message 2 from Casey Key.' to connection 3
+sending b'Message 2 from Casey Key.' to connection 4
+sending b'Message 2 from Casey Key.' to connection 5
+sending b'Message 2 from Casey Key.' to connection 6
+sending b'Message 2 from Casey Key.' to connection 7
+sending b'Message 2 from Casey Key.' to connection 8
+sending b'Message 2 from Casey Key.' to connection 9
+sending b'Message 2 from Casey Key.' to connection 10
+received b'Message 1 from Casey Key.Message 2 from Casey Key.' from connection 1
+closing connection 1
+received b'Message 1 from Casey Key.Message 2 from Casey Key.' from connection 2
+closing connection 2
+received b'Message 1 from Casey Key.Message 2 from Casey Key.' from connection 3
+closing connection 3
+received b'Message 1 from Casey Key.Message 2 from Casey Key.' from connection 4
+closing connection 4
+received b'Message 1 from Casey Key.Message 2 from Casey Key.' from connection 5
+closing connection 5
+received b'Message 1 from Casey Key.Message 2 from Casey Key.' from connection 6
+closing connection 6
+received b'Message 1 from Casey Key.Message 2 from Casey Key.' from connection 7
+closing connection 7
+received b'Message 1 from Casey Key.Message 2 from Casey Key.' from connection 8
+closing connection 8
+received b'Message 1 from Casey Key.Message 2 from Casey Key.' from connection 9
+closing connection 9
+received b'Message 1 from Casey Key.Message 2 from Casey Key.' from connection 10
+closing connection 10
+
+1) Do the client sockets block waiting for an event? (True/False)
+False
+
+2) How do asynchronous operations among clients happen? (1 or 2 sentences describing the mechanism)
+Asynchrous connections are done by registering a selector when a connection is established. This can be done happen many times, and can be serviced independently.
+ 

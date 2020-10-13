@@ -1,0 +1,93 @@
+import sys, time
+from socket import *
+
+# Initialization Section
+#    Set host, port and timeout
+host = '127.0.0.1'
+port = 12000
+timeout = 1 # in second
+seq = 1
+# create dgram udp socket
+try:
+    s = socket(AF_INET, SOCK_DGRAM)
+    s.settimeout(1)
+except socket.error:
+    print('Failed to create socket')
+    sys.exit()
+    
+# Ping for 10 times using a while loop
+while seq <= 10:
+    t = time.localtime()
+    message = f"Ping {seq} {time.asctime(t)}"
+    seq += 1
+    
+    # Put the rest in a try/except block to handle any possible timeouts
+    try:
+        # YOU FILL IN: Set a variable for the time sent (hint: time.time() is nice)
+        start = time.time()
+        # YOU FILL IN:Send the UDP packet with the ping message
+        s.sendto(message.encode(), (host, port))
+        
+        # YOU FILL IN: Receive the server response and address; user recvfrom(1024).   Read the documentation!
+        #              Pay attention to the format of the returned parameters.
+        data = s.recvfrom(1024)
+        reply = data[0]
+        addr = data[1]
+        
+        # YOU FILL IN: Set a variable for the time received
+        finish = time.time()
+        
+        # YOU FILL IN:Print the server response as an output as described earlier: PING FROM ADDRESS: MESSAGE
+        #             Notice the message that is returned is a byte string, not a normal UTF-8 string
+        #             To get a normal string use the mystring.decode() standard function
+        #             Also, print only the IPv4 address.  I'm not interested in the port number.
+        print(f"Reply from {addr[0]}: {reply.decode()}")
+        # YOU FILL IN: calculate and print the round trip time
+        print(f"RTT: {finish-start}")
+        
+    except Exception as e:
+        # Server does not respond.  Assume the packet is lost
+        # Assume the packet is lost
+        print ("Request timed out.")
+        continue
+
+# Close the client socket
+s.close()
+
+
+Reply from 127.0.0.1: PING 1 MON SEP 14 23:52:09 2020
+RTT: 0.00040531158447265625
+Reply from 127.0.0.1: PING 2 MON SEP 14 23:52:09 2020
+RTT: 0.0008680820465087891
+Reply from 127.0.0.1: PING 3 MON SEP 14 23:52:09 2020
+RTT: 0.0005574226379394531
+Reply from 127.0.0.1: PING 4 MON SEP 14 23:52:09 2020
+RTT: 0.0008130073547363281
+Request timed out.
+Reply from 127.0.0.1: PING 6 MON SEP 14 23:52:10 2020
+RTT: 0.0009303092956542969
+Request timed out.
+Reply from 127.0.0.1: PING 8 MON SEP 14 23:52:11 2020
+RTT: 0.0009927749633789062
+Reply from 127.0.0.1: PING 9 MON SEP 14 23:52:11 2020
+RTT: 0.0011928081512451172
+Reply from 127.0.0.1: PING 10 MON SEP 14 23:52:11 2020
+RTT: 0.0004343986511230469
+
+Reply from 129.82.44.96: PING 1 MON SEP 14 23:57:28 2020
+RTT: 0.0004894733428955078
+Request timed out.
+Reply from 129.82.44.96: PING 3 MON SEP 14 23:57:29 2020
+RTT: 0.00032782554626464844
+Request timed out.
+Request timed out.
+Reply from 129.82.44.96: PING 6 MON SEP 14 23:57:31 2020
+RTT: 0.0003287792205810547
+Reply from 129.82.44.96: PING 7 MON SEP 14 23:57:31 2020
+RTT: 0.0003314018249511719
+Reply from 129.82.44.96: PING 8 MON SEP 14 23:57:31 2020
+RTT: 0.00029778480529785156
+Reply from 129.82.44.96: PING 9 MON SEP 14 23:57:31 2020
+RTT: 0.00024127960205078125
+Reply from 129.82.44.96: PING 10 MON SEP 14 23:57:31 2020
+RTT: 0.00023436546325683594
