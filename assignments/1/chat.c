@@ -2,6 +2,8 @@
 ** server.c -- a stream socket server demo
 */
 
+#include <stdbool.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -33,7 +35,7 @@ void *get_in_addr(struct sockaddr *sa)
 
 void getInput(char *question, char *inputBuffer)
 {
-    printf("%s", question, MAXDATASIZE - 1);
+    printf("%s", question);
     fgets(inputBuffer, MAXDATASIZE, stdin);
 
     if (inputBuffer[strlen(inputBuffer) -1] != '\n')
@@ -57,7 +59,7 @@ void getInput(char *question, char *inputBuffer)
 
 
 
-int client(char *hostname) {
+int client(char* port, char *hostname) {
     int sockfd, numbytes;  
     char buf[MAXDATASIZE];
     struct addrinfo hints, *servinfo, *p;
@@ -68,7 +70,7 @@ int client(char *hostname) {
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    if ((rv = getaddrinfo(hostname, PORT, &hints, &servinfo)) != 0) {
+    if ((rv = getaddrinfo(hostname, port, &hints, &servinfo)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
         return 1;
     }
@@ -172,15 +174,23 @@ int server() {
         
 
         char hostbuffer[256];
-        char *IPbuffer;
+        char IPbuffer[INET_ADDRSTRLEN];
         struct hostent *host_entry;
+        struct addrinfo *host_res;
 
         gethostname(hostbuffer, sizeof(hostbuffer));
-        host_entry = gethostbyname(hostbuffer);
-        IPbuffer = inet_ntoa(*((struct in_addr*)
-                         host_entry->h_addr_list[0]));
+        getaddrinfo(hostbuffer, NULL, &hints, &host_res);
+        struct sockaddr_in *ipv4 = (struct sockaddr_in *)host_res->ai_addr;
+        void *addr = &(ipv4->sin_addr); 
+        inet_ntop(host_res->ai_family, addr, IPbuffer, sizeof IPbuffer);
+ 
+
+        //host_entry = gethostbyname(hostbuffer);
+        //IPbuffer = inet_ntoa(*((struct in_addr*)
+        //                 host_entry->h_addr_list[0]));
 
         printf("Waiting for connection on %s port %d\n", IPbuffer, ((struct sockaddr_in *)our_addr)->sin_port);
+        freeaddrinfo(host_res);
         break;
     }
 
@@ -201,14 +211,20 @@ int server() {
     new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
     if (new_fd == -1) {
         perror("accept");
-        continue;
     }
 
     bool receiving = true;
     while (true) {
         if (receiving) {
             printf("Found a friend! You receive first.");
-
+            int numbytes;
+            char buf[MAXDATASIZE]; 
+            if ((numbytes = recv(new_fd, buf, MAXDATASIZE-1, 0)) == -1) {
+                perror("server recv");
+                exit(1);
+            }
+            buf[numbytes] = '\0';
+            printf("Friend: %s\n", buf);
             receiving = false;
         }
         else {
@@ -221,7 +237,96 @@ int server() {
 
 }
 
-int main()
-{
+bool isPort(char number[]) {
+    int i = 0;
 
+    //checking for negative numbers
+    if (number[0] == '-')
+        return false;
+    for (; number[i] != 0; i++)
+    {
+        //if (number[i] > '9' || number[i] < '0')
+        if (!isdigit(number[i]))
+            return false;
+    }
+
+
+    int port = atoi(number);
+    if (port < 0 || port > 65535)
+        return false;
+    
+    return true;
+}
+
+bool isIPAddress(char* ip) {
+    // Check IP address
+    unsigned char buf[sizeof(struct in_addr)];
+    if (inet_pton(AF_INET, ip, buf) <= 0) {
+        return false;
+    }
+    return true;
+}
+
+void help() {
+    printf("Usage: ./chat [flags] [arguments]\n");
+    printf("Flags:\n-h displays this message\n-p specifies port -s IP address of server\n");
+    printf("No flags or arguments will run the chat program as a server.\n");
+    return;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc > 1) {
+        if (strcmp(argv[1], "-h") == 0) {
+            help();
+        }
+        // Validate client configuration
+        else if (strcmp(argv[1], "-p") == 0) {
+            if (argc < 4 || strcmp(argv[3], "-s") != 0) 
+                printf("Client connections require both -p PORT and -s SERVER_IP arguments");
+            
+            else if (!isPort(argv[2]))
+                printf("Port number must be between 0 and 65535.");
+            
+            else if (!isIPAddress(argv[4]))
+                printf("Invalid IPv4 address.");
+            
+            else {
+                char *port = argv[2];
+                char *ip_addr = argv[4];
+                client(port, ip_addr);
+            }
+            
+            return 1;
+        }
+        
+        // Validate client configuration
+        else if (strcmp(argv[1], "-s") == 0) {
+            if (argc < 4 || strcmp(argv[3], "-p") != 0) 
+                printf("Client connections require both -p PORT and -s SERVER_IP arguments");
+            
+            else if (!isPort(argv[4]))
+                printf("Port number must be between 0 and 65535.");
+            
+            else if (!isIPAddress(argv[2]))
+                printf("Invalid IPv4 address.");
+            
+            else {
+                char *port = argv[4];
+                char *ip_addr = argv[2];
+                client(port, ip_addr);
+            }
+            
+            // Invalid arguments 
+            return 1;
+        }
+        
+        else {
+            help();
+        }
+    }    
+    
+    // No arguments
+    else {
+        server();
+    }
 }
