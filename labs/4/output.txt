@@ -1,0 +1,30 @@
+
+
+n3 ./app-client.py '127.0.0.1' 65432 negate -325
+starting connection to ('127.0.0.1', 65432)
+sending b'\x00\x7f{"byteorder": "little", "content-type": "binary/custom-client-binary-type", "content-encoding": "binary", "content-length": 10}negate\xff\xff\xfe\xbb' to ('127.0.0.1', 65432)    
+received binary/custom-server-binary-type response from ('127.0.0.1', 65432)
+got response: b'result\x00\x00\x01E'
+result:  325
+closing connection to ('127.0.0.1', 65432)       
+➜  4 python3 ./app-client.py '127.0.0.1' 65432 negate 4563
+starting connection to ('127.0.0.1', 65432)
+sending b'\x00\x7f{"byteorder": "little", "content-type": "binary/custom-client-binary-type", "content-encoding": "binary", "content-length": 10}negate\x00\x00\x11\xd3' to ('127.0.0.1', 65432)    
+received binary/custom-server-binary-type response from ('127.0.0.1', 65432)
+got response: b'result\xff\xff\xee-'
+result:  -4563
+closing connection to ('127.0.0.1', 65432)       
+➜  4 python3 ./app-client.py '127.0.0.1' 65432 double 1337
+starting connection to ('127.0.0.1', 65432)
+sending b'\x00\x7f{"byteorder": "little", "content-type": "binary/custom-client-binary-type", "content-encoding": "binary", "content-length": 10}double\x00\x00\x059' to ('127.0.0.1', 65432)       
+received binary/custom-server-binary-type response from ('127.0.0.1', 65432)
+got response: b'result\x00\x00\nr'
+result:  2674
+closing connection to ('127.0.0.1', 65432)       
+➜  4 python3 ./app-client.py '127.0.0.1' 65432 double -42
+starting connection to ('127.0.0.1', 65432)
+sending b'\x00\x7f{"byteorder": "little", "content-type": "binary/custom-client-binary-type", "content-encoding": "binary", "content-length": 10}double\xff\xff\xff\xd6' to ('127.0.0.1', 65432)    
+received binary/custom-server-binary-type response from ('127.0.0.1', 65432)
+got response: b'result\xff\xff\xff\xac'
+result:  -84
+closing connection to ('127.0.0.1', 65432)
