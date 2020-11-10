@@ -3,8 +3,8 @@ from socket import *
 
 # Initialization Section
 #    Set host, port and timeout
-host = '127.0.0.1'
-port = 12000
+host = 'google.com'
+port = 7
 timeout = 1 # in second
 seq = 1
 # create dgram udp socket
