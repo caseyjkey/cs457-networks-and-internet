@@ -59,47 +59,13 @@ void getInput(char *question, char *inputBuffer) {
 }
 
 
-char* stuff_packet(char* msg) {
-    short int ver = 457;
-    short int version = htons(ver);
-    short int len = 0;
-    while (msg[len] != '\0')
-        len++;
-    len++;
-    printf("len before: %hd\n", len);
-    int net_len = htons(len);
-    printf("n ver: %hd, n len %hd", ntohs(version), ntohs(net_len));
-    char* packet = malloc(MAXDATASIZE + 4);
- 
-    memcpy(packet, &version, 2);
-    memcpy(&packet[2], &net_len, 2);
-    memcpy(&packet[4], msg, len); 
-
-    return packet;
-}
-
-char* unstuff_packet(char* packet) {
-    printf("\n\nstuffed: %s\n", packet);
-    short int version;
-    memcpy(&version, packet, 2);
-    short int len;
-    memcpy(&len, &packet[2], 2);
-    version = ntohs(version);
-    len = ntohs(len);
-    
-    printf("len %d, version %d", len, version);
-    char* msg = malloc(MAXDATASIZE);
-    memcpy(&packet[4], msg, len);
-
-    return msg; 
-}
 
 int client(char* port, char *hostname) {
     int sockfd, numbytes;  
     char buf[MAXDATASIZE];
 
 
-    printf("Connecting to server...\n");
+    printf("Connecting to server... ");
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
         perror("client: socket");
         exit(1);
@@ -123,23 +89,16 @@ int client(char* port, char *hostname) {
     char msg[MAXDATASIZE];
     printf("Connected to a friend! You send first.\n");
     
-    char packet[MAXDATASIZE + 4];
+
     while (true) {
         bzero(msg, sizeof(msg));
         getInput("You: ", msg);
-        int len = 0;
-        while(msg[len] != '\0')
-            len++;
-        memcpy(stuff_packet(msg), packet, len + 4);
-        write(sockfd, packet, sizeof(char[len + 4]));
+        write(sockfd, msg, sizeof(msg));
         bzero(msg, sizeof(msg));
-        read(sockfd, packet, sizeof(char[MAXDATASIZE + 4]));
-        memcpy(unstuff_packet(packet), msg, MAXDATASIZE);
+        read(sockfd, msg, sizeof(msg));
         printf("Friend: %s\n", msg);
     } 
 
-    free(packet);
-    free(msg);
     return 0;
 }
 
@@ -158,7 +117,10 @@ const char* getLocalIP() {
             continue;
         if (!(ifa->ifa_flags & IFF_UP))
             continue;
-
+	
+				if (strcmp(ifa->ifa_name, "virbr0") == 0)
+						continue;
+ 
         switch (ifa->ifa_addr->sa_family) {
             case AF_INET:
             {
@@ -220,35 +182,24 @@ int server() {
 
     printf("Found a friend! You receive first.\n");
 
-
-    char buf[MAXDATASIZE];
-    char packet[MAXDATASIZE + 4];
     while (true) {
+        char buf[MAXDATASIZE];
 
         bzero(buf, sizeof(buf));
         int numbytes;
-        //if ((numbytes = read(new_fd, packet, sizeof(char[144]))) == -1) {
-        //    perror("server recv");
-        //    exit(1);
-        //}
-        read(new_fd, packet, sizeof(char[144]));
-        printf("After read");
-        memcpy(unstuff_packet(packet), buf, MAXDATASIZE);
+        if ((numbytes = read(new_fd, buf, sizeof(buf))) == -1) {
+            perror("server recv");
+            exit(1);
+        }
 
         printf("Friend: %s\n", buf);
-        
+
         bzero(buf, sizeof(buf));
         getInput("You: ", buf);
-        int len = 0;
-        while(buf[len] != '\0')
-            len++;
-        memcpy(stuff_packet(buf), packet, len+4); 
-        if (write(new_fd, packet, sizeof(char[len+4])) == -1)
+        if (write(new_fd, buf, sizeof(buf)) == -1)
             perror("send");
     }
     
-    free(buf);
-    free(packet);
     close(sockfd);
     return 0;
 
